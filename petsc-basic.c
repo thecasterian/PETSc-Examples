@@ -10,9 +10,7 @@ int main(int argc, char *argv[]) {
     PetscErrorCode ierr;
     PetscInt n = 0;
     PetscReal r = 1.5;
-
-    int rank;
-    int size;
+    PetscMPIInt rank, size;
 
     /* Initialize PETSc. The first and second parameter are pointers to `argc`
        and `argv`, respectively. The third is the path to the option file. The
