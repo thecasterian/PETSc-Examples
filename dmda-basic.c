@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
     PetscOptionsGetInt(NULL, NULL, "-stencil_width", &stencil_width, NULL);
 
-    /* Create the DMDA object of global size 65 x 65. */
+    /* Create the DMDA object of global size 3 x 3. */
     DMDACreate2d(
         PETSC_COMM_WORLD,   /* MPI communicator. */
         DM_BOUNDARY_NONE,
