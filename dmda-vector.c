@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
     const PetscReal **arrvread;
     PetscReal x, y;
     PetscReal exrel, eyrel, exnorm, eynorm, gxtnorm, gytnorm;
+    PetscInt i, j;
 
     /*----------------------------- Initialize. ------------------------------*/
     /* Initialize PETSc. */
@@ -49,8 +50,8 @@ int main(int argc, char *argv[]) {
     DMDAVecGetArray(da, v, &arrv);
     /* Set values. Note that each process has local part of the array only and
        the array is column-major. */
-    for (int j = info.ys; j < info.ys + info.ym; j++)
-        for (int i = info.xs; i < info.xs + info.xm; i++) {
+    for (j = info.ys; j < info.ys + info.ym; j++)
+        for (i = info.xs; i < info.xs + info.xm; i++) {
             x = i * hx;
             y = j * hy;
             arrv[j][i] = y * PetscExpReal(x) + 3 * y * y;
@@ -68,8 +69,8 @@ int main(int argc, char *argv[]) {
     DMDAVecGetArray(da, gy, &arrgy);
 
     /* Calculate gradients. */
-    for (int j = info.ys; j < info.ys + info.ym; j++)
-        for (int i = info.xs; i < info.xs + info.xm; i++) {
+    for (j = info.ys; j < info.ys + info.ym; j++)
+        for (i = info.xs; i < info.xs + info.xm; i++) {
             /* At i = 0 and i = mx-1, the central differencing scheme is not
                applicable. */
             if (i == 0)
@@ -102,8 +103,8 @@ int main(int argc, char *argv[]) {
     /* Calculate the true gradients value. */
     DMDAVecGetArray(da, gxt, &arrgx);
     DMDAVecGetArray(da, gyt, &arrgy);
-    for (int j = info.ys; j < info.ys + info.ym; j++)
-        for (int i = info.xs; i < info.xs + info.xm; i++) {
+    for (j = info.ys; j < info.ys + info.ym; j++)
+        for (i = info.xs; i < info.xs + info.xm; i++) {
             x = i * hx;
             y = j * hy;
             arrgx[j][i] = y * PetscExpReal(x);

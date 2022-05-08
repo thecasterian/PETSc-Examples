@@ -1,21 +1,12 @@
 /*
 This code solves a non-linear equation F(x) = 0 using SNES where
-         [ x0^2 + x1^2 + x2^2 - 5  ]
-  F(x) = [          2*x0 - x1 + x2 ]
-         [          x0*x1 + x2 + 2 ]
-and its Jacobin is
-         [ 2*x0 2*x1 2*x2 ]
-  J(x) = [    2   -1    1 ].
-         [   x1   x0    1 ]
-Note that the answer x is
+         [ x0^2 + x1^2 - 4*x2 - 4 ]
+  F(x) = [       x0 - x1 - x2 - 3 ].
+         [       3*x0 + x1*x2 - 4 ]
+The solution is
+  [  2 ]
+  [ -2 ].
   [  1 ]
-  [  0 ]
-  [ -2 ]
-and
-  [  0.1824 ]
-  [ -1.3828 ],
-  [ -1.7477 ]
-depending on the initial value.
 */
 
 #include <petsc.h>
@@ -38,9 +29,8 @@ int main(int argc, char *argv[]) {
     VecSetSizes(x, PETSC_DECIDE, 3);
     /* Determine other vector properties from command-line options. */
     VecSetFromOptions(x);
-    /* Set the initial values: all zeros. Here, small number close to zero is
-       provided to prevent the divide-by-zero error. */
-    VecSet(x, 1e-6);
+    /* Set the initial values: all zeros. */
+    VecSet(x, 0);
     /* Create the residual vector r duplicating the solution vector. */
     VecDuplicate(x, &r);
 
@@ -83,9 +73,9 @@ static PetscErrorCode FormFunction(SNES snes, Vec x, Vec F, void *ctx) {
     VecGetArray(F, &arrF);
 
     /* Calculate F(x). */
-    arrF[0] = arrx[0] * arrx[0] + arrx[1] * arrx[1] + arrx[2] * arrx[2] - 5;
-    arrF[1] = 2 * arrx[0] - arrx[1] + arrx[2];
-    arrF[2] = arrx[0] * arrx[1] + arrx[2] + 2;
+    arrF[0] = arrx[0] * arrx[0] + arrx[1] * arrx[1] - 4 * arrx[2] - 4;
+    arrF[1] = arrx[0] - arrx[1] - arrx[2] - 3;
+    arrF[2] = 3 * arrx[0] + arrx[1] * arrx[2] - 4;
 
     /* Tell PETSc that pointers are no longer used. These calls set pointers
        to NULL. VecGetArray() and VecRestoreArray() must be pair one-to-one.
