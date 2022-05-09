@@ -17,9 +17,9 @@ and KSP.
 const char *const help
     = "Solve a 2D Poisson equation on a unit square with KSP.\n\n";
 
-PetscErrorCode FormMatrix(DM da, Mat A);
-PetscErrorCode FormRHS(DM da, Vec b);
-PetscErrorCode FormExactSolution(DM da, Vec ut);
+PetscErrorCode FormMatrix(DM, Mat);
+PetscErrorCode FormRHS(DM, Vec);
+PetscErrorCode FormExactSolution(DM, Vec);
 
 int main(int argc, char *argv[]) {
     DM da;

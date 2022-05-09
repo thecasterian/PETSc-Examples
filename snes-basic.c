@@ -29,8 +29,6 @@ int main(int argc, char *argv[]) {
     VecSetSizes(x, PETSC_DECIDE, 3);
     /* Determine other vector properties from command-line options. */
     VecSetFromOptions(x);
-    /* Set the initial values: all zeros. */
-    VecSet(x, 0);
     /* Create the residual vector r duplicating the solution vector. */
     VecDuplicate(x, &r);
 
@@ -44,6 +42,8 @@ int main(int argc, char *argv[]) {
     SNESSetFromOptions(snes);
 
     /*----------------------------- Solve. -----------------------------------*/
+    /* Set the initial value: all ones. */
+    VecSet(x, 1);
     /* Solve the non-linear equation. The second parameter is the RHS of the
        equation; set to NULL if 0. */
     SNESSolve(snes, NULL, x);

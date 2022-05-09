@@ -11,6 +11,9 @@ ksp-basic: ksp-basic.c
 snes-basic: snes-basic.c
 	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS)
 
+snes-jacobian: snes-jacobian.c
+	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS)
+
 dmda-basic: dmda-basic.c
 	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS)
 
