@@ -14,6 +14,9 @@ snes-basic: snes-basic.c
 snes-jacobian: snes-jacobian.c
 	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS)
 
+snes-linear: snes-linear.c
+	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS)
+
 dmda-basic: dmda-basic.c
 	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS)
 
