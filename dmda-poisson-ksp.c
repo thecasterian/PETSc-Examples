@@ -8,8 +8,14 @@ on a unit sqaure [0, 1] x [0, 1] with the boundary condition
     u(x, 1) = 0.
 The exact solution is
     u(x, y) = -x^3(y^2-1).
+
 This code solves the equation above using a finite difference method with a DMDA
-and KSP.
+and KSP. The discretization scheme uses a 5-point star stencil:
+    hy/hx * [2*u(i, j) - u(i+1, j) - u(i-1, j)]
+        + hx/hy * [2*u(i, j) - u(i, j+1) - u(i, j-1)]
+        = hx*hy * f(i, j)
+where hx and hy are the grid spacing in the x- and y-directions, respectively,
+and f(i, j) is the RHS of the Poisson equation.
 */
 
 #include <petsc.h>
@@ -98,19 +104,19 @@ PetscErrorCode FormMatrix(DM da, Mat A) {
                 v[0] = 1.0;
                 ncols = 1;
             } else {
-                v[0] = 2.0 / (hx * hx) + 2.0 / (hy * hy);
+                v[0] = 2.0 * (hy / hx + hx / hy);
                 col[1].i = i + 1;
                 col[1].j = j;
-                v[1] = -1.0 / (hx * hx);
+                v[1] = -hy / hx;
                 col[2].i = i - 1;
                 col[2].j = j;
-                v[2] = -1.0 / (hx * hx);
+                v[2] = -hy / hx;
                 col[3].i = i;
                 col[3].j = j + 1;
-                v[3] = -1.0 / (hy * hy);
+                v[3] = -hx / hy;
                 col[4].i = i;
                 col[4].j = j - 1;
-                v[4] = -1.0 / (hy * hy);
+                v[4] = -hx / hy;
                 ncols = 5;
             }
 
@@ -152,7 +158,7 @@ PetscErrorCode FormRHS(DM da, Vec b) {
             else if (j == info.my - 1)
                 arrb[j][i] = 0.0;
             else
-                arrb[j][i] = 2.0*x*x*x + 6.0*x*(y*y-1);
+                arrb[j][i] = hx * hy * (2.0*x*x*x + 6.0*x*(y*y-1));
         }
     DMDAVecRestoreArray(da, b, &arrb);
 
