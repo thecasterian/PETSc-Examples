@@ -13,7 +13,7 @@ The solution is
 
 static const char *const help = "Solve a non-linear equation using SNES.\n\n";
 
-static PetscErrorCode FormFunction(SNES, Vec, Vec, void *);
+PetscErrorCode FormFunction(SNES, Vec, Vec, void *);
 
 int main(int argc, char *argv[]) {
     Vec x, r;
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 /* This function calculates the vector F(x) for the given vector x. The last
    parameter ctx is the pointer to the user-supplied data, such as coefficients
    in terms. */
-static PetscErrorCode FormFunction(SNES snes, Vec x, Vec F, void *ctx) {
+PetscErrorCode FormFunction(SNES snes, Vec x, Vec F, void *ctx) {
     const PetscReal *arrx;
     PetscReal *arrF;
 

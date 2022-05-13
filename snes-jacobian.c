@@ -12,8 +12,8 @@ The solution must be same.
 static const char *const help
     = "Solve a non-linear equation using SNES with the Jacobian.\n\n";
 
-static PetscErrorCode FormFunction(SNES, Vec, Vec, void *);
-static PetscErrorCode FormJacobian(SNES, Vec, Mat, Mat, void *);
+PetscErrorCode FormFunction(SNES, Vec, Vec, void *);
+PetscErrorCode FormJacobian(SNES, Vec, Mat, Mat, void *);
 
 int main(int argc, char *argv[]) {
     Vec x, r;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     PetscFinalize();
 }
 
-static PetscErrorCode FormFunction(SNES snes, Vec x, Vec F, void *ctx) {
+PetscErrorCode FormFunction(SNES snes, Vec x, Vec F, void *ctx) {
     const PetscReal *arrx;
     PetscReal *arrF;
 
@@ -77,8 +77,7 @@ static PetscErrorCode FormFunction(SNES snes, Vec x, Vec F, void *ctx) {
     return 0;
 }
 
-static PetscErrorCode FormJacobian(SNES snes, Vec x, Mat J, Mat Jpre,
-                                   void *ctx) {
+PetscErrorCode FormJacobian(SNES snes, Vec x, Mat J, Mat Jpre, void *ctx) {
     /* Similar to SNESSetJacobian(), J is the Jacobian Matrix and Jpre is a
        matrix used to construct a preconditioner. Since two matrices are same
        in SNESSetJacobian(), setting only one matrix is sufficient. However,

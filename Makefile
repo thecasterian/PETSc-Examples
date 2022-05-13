@@ -25,3 +25,6 @@ dmda-vector: dmda-vector.c
 
 dmda-poisson-ksp: dmda-poisson-ksp.c
 	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS)
+
+dmda-poisson-snes: dmda-poisson-snes.c
+	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS)

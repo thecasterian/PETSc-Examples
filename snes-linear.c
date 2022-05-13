@@ -15,8 +15,8 @@ which is same as in ksp-basic.c, but with SNES. The solution must be same.
 
 static const char *const help = "Solve a 4x4 linear system using SNES.\n\n";
 
-static PetscErrorCode FormFunction(SNES, Vec, Vec, void *);
-static PetscErrorCode FormJacobian(SNES, Vec, Mat, Mat, void *);
+PetscErrorCode FormFunction(SNES, Vec, Vec, void *);
+PetscErrorCode FormJacobian(SNES, Vec, Mat, Mat, void *);
 
 int main(int argc, char *argv[]) {
     Vec x, r;
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     PetscFinalize();
 }
 
-static PetscErrorCode FormFunction(SNES snes, Vec x, Vec F, void *ctx) {
+PetscErrorCode FormFunction(SNES snes, Vec x, Vec F, void *ctx) {
     const PetscReal *arrx;
     PetscReal *arrF;
 
@@ -81,8 +81,7 @@ static PetscErrorCode FormFunction(SNES snes, Vec x, Vec F, void *ctx) {
     return 0;
 }
 
-static PetscErrorCode FormJacobian(SNES snes, Vec x, Mat J, Mat Jpre,
-                                   void *ctx) {
+PetscErrorCode FormJacobian(SNES snes, Vec x, Mat J, Mat Jpre, void *ctx) {
     const PetscReal *arrx;
     PetscReal v[16];
     const PetscInt row[4] = {0, 1, 2, 3}, col[4] = {0, 1, 2, 3};

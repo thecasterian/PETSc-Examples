@@ -69,6 +69,13 @@ int main(int argc, char *argv[]) {
     VecNorm(ut, NORM_INFINITY, &e);
     PetscPrintf(PETSC_COMM_WORLD, "Maximum error: %g\n", e);
 
+    /* Clean up. */
+    DMDestroy(&da);
+    VecDestroy(&b);
+    VecDestroy(&u);
+    VecDestroy(&ut);
+    KSPDestroy(&ksp);
+
     /* Finalize PETSc. */
     PetscFinalize();
 }
