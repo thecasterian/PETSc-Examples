@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
                                process has depends on this value. */
         NULL, NULL,         /* Arrays of the number of nodes in each process
                                along the x- and y-directions. Since PETSc
-                               decides it, set this to NULL. */
+                               decides it, set these to NULL. */
         &da
     );
     DMSetFromOptions(da);
