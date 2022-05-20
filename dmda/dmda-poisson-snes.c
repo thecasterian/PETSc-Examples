@@ -111,13 +111,11 @@ PetscErrorCode FormFunctionLocal(DMDALocalInfo *info, void *_arrx, void *_arrF,
                 arrF[j][i] = arrx[j][i] - x*x*x;
             else if (j == info->my - 1)
                 arrF[j][i] = arrx[j][i];
-            else {
+            else
                 arrF[j][i]
                     = hy/hx * (2*arrx[j][i] - arrx[j][i+1] - arrx[j][i-1])
                       + hx/hy * (2*arrx[j][i] - arrx[j+1][i] - arrx[j-1][i])
                       - hx*hy * (2*x*x*x + 6*x*(y*y-1));
-                arrF[j][i] *= hx * hy;
-            }
         }
 
     return 0;
