@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 
     /* Create DMDA. */
     DMDACreate2d(PETSC_COMM_WORLD, DM_BOUNDARY_NONE, DM_BOUNDARY_NONE,
-                 DMDA_STENCIL_STAR, 9, 9, PETSC_DECIDE, PETSC_DECIDE, 1, 1,
+                 DMDA_STENCIL_STAR, 3, 3, PETSC_DECIDE, PETSC_DECIDE, 1, 1,
                  NULL, NULL, &da);
     DMSetFromOptions(da);
     DMSetUp(da);
@@ -92,7 +92,7 @@ PetscErrorCode FormFunctionLocal(DMDALocalInfo *info, void *_arrx, void *_arrF,
        function accepts x and F as a 2D array to make the code simple. */
     PetscReal **arrx = _arrx, **arrF = _arrF;
     PetscReal hx, hy;
-    PetscReal x, y;
+    PetscReal x, y, f;
     PetscInt i, j;
 
     hx = 1.0 / (info->mx - 1);
@@ -104,18 +104,21 @@ PetscErrorCode FormFunctionLocal(DMDALocalInfo *info, void *_arrx, void *_arrF,
             y = j * hy;
 
             if (i == 0)
-                arrF[j][i] = arrx[j][i];
+                arrF[j][i] = arrx[j][i] - PetscCosReal(2*PETSC_PI*y);
             else if (i == info->mx - 1)
-                arrF[j][i] = arrx[j][i] - (-y*y + 1);
+                arrF[j][i] = arrx[j][i] - PetscCosReal(2*PETSC_PI*y);
             else if (j == 0)
-                arrF[j][i] = arrx[j][i] - x*x*x;
+                arrF[j][i] = arrx[j][i] - PetscCosReal(2*PETSC_PI*x);
             else if (j == info->my - 1)
-                arrF[j][i] = arrx[j][i];
-            else
+                arrF[j][i] = arrx[j][i] - PetscCosReal(2*PETSC_PI*x);
+            else {
+                f = 8.0*PETSC_PI*PETSC_PI * PetscCosReal(2*PETSC_PI*x)
+                    * PetscCosReal(2*PETSC_PI*y);
                 arrF[j][i]
                     = hy/hx * (2*arrx[j][i] - arrx[j][i+1] - arrx[j][i-1])
                       + hx/hy * (2*arrx[j][i] - arrx[j+1][i] - arrx[j-1][i])
-                      - hx*hy * (2*x*x*x + 6*x*(y*y-1));
+                      - hx*hy * f;
+            }
         }
 
     return 0;
@@ -195,13 +198,13 @@ PetscErrorCode FormInitial(DM da, Vec u) {
             /* The initial value equals to the boundary condition on the
                boundary and equals to 0 elsewhere. */
             if (i == 0)
-                arru[j][i] = 0.0;
+                arru[j][i] = PetscCosReal(2*PETSC_PI*y);
             else if (i == info.mx - 1)
-                arru[j][i] = -y*y + 1;
+                arru[j][i] = PetscCosReal(2*PETSC_PI*y);
             else if (j == 0)
-                arru[j][i] = x*x*x;
+                arru[j][i] = PetscCosReal(2*PETSC_PI*x);
             else if (j == info.my - 1)
-                arru[j][i] = 0.0;
+                arru[j][i] = PetscCosReal(2*PETSC_PI*x);
             else
                 arru[j][i] = 0.0;
         }
@@ -224,7 +227,8 @@ PetscErrorCode FormExactSolution(DM da, Vec ut) {
         for (i = info.xs; i < info.xs + info.xm; i++) {
             x = i * hx;
             y = j * hy;
-            arrut[j][i] = -x*x*x * (y*y - 1);
+            arrut[j][i] = PetscCosReal(2*PETSC_PI*x)
+                          * PetscCosReal(2*PETSC_PI*y);
         }
     DMDAVecRestoreArray(da, ut, &arrut);
 

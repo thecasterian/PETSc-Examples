@@ -1,13 +1,13 @@
 /*
 Consider a Poisson equation
-    -(u_xx + u_yy) = 2x^3 + 6x(y^2-1)
+    -(u_xx + u_yy) = 8 pi^2 cos(2 pi x) cos(2 pi y)
 on a unit sqaure [0, 1] x [0, 1] with the boundary condition
-    u(0, y) = 0
-    u(1, y) = -y^2 + 1
-    u(x, 0) = x^3
-    u(x, 1) = 0.
+    u(0, y) = cos(2 pi y),
+    u(1, y) = cos(2 pi y),
+    u(x, 0) = cos(2 pi x),
+    u(x, 1) = cos(2 pi x).
 The exact solution is
-    u(x, y) = -x^3(y^2-1).
+    u(x, y) = cos(2 pi x) cos(2 pi y).
 
 This code solves the equation above using a finite difference method with a DMDA
 and KSP. The discretization scheme uses a 5-point star stencil:
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 
     /* Create a DMDA of default size 9 x 9. */
     DMDACreate2d(PETSC_COMM_WORLD, DM_BOUNDARY_NONE, DM_BOUNDARY_NONE,
-                 DMDA_STENCIL_STAR, 9, 9, PETSC_DECIDE, PETSC_DECIDE, 1, 1,
+                 DMDA_STENCIL_STAR, 3, 3, PETSC_DECIDE, PETSC_DECIDE, 1, 1,
                  NULL, NULL, &da);
     DMSetFromOptions(da);
     DMSetUp(da);
@@ -141,7 +141,7 @@ PetscErrorCode FormMatrix(DM da, Mat A) {
 PetscErrorCode FormRHS(DM da, Vec b) {
     DMDALocalInfo info;
     PetscReal hx, hy;
-    PetscReal **arrb, x, y;
+    PetscReal **arrb, x, y, f;
     PetscInt i, j;
 
     /* Get the local information. */
@@ -157,15 +157,18 @@ PetscErrorCode FormRHS(DM da, Vec b) {
             x = i * hx;
             y = j * hy;
             if (i == 0)
-                arrb[j][i] = 0.0;
+                arrb[j][i] = PetscCosReal(2*PETSC_PI*y);
             else if (i == info.mx - 1)
-                arrb[j][i] = -y*y + 1;
+                arrb[j][i] = PetscCosReal(2*PETSC_PI*y);
             else if (j == 0)
-                arrb[j][i] = x*x*x;
+                arrb[j][i] = PetscCosReal(2*PETSC_PI*x);
             else if (j == info.my - 1)
-                arrb[j][i] = 0.0;
-            else
-                arrb[j][i] = hx * hy * (2.0*x*x*x + 6.0*x*(y*y-1));
+                arrb[j][i] = PetscCosReal(2*PETSC_PI*x);
+            else {
+                f = 8.0*PETSC_PI*PETSC_PI * PetscCosReal(2*PETSC_PI*x)
+                    * PetscCosReal(2*PETSC_PI*y);
+                arrb[j][i] = hx*hy * f;
+            }
         }
     DMDAVecRestoreArray(da, b, &arrb);
 
@@ -190,7 +193,8 @@ PetscErrorCode FormExactSolution(DM da, Vec ut) {
         for (i = info.xs; i < info.xs + info.xm; i++) {
             x = i * hx;
             y = j * hy;
-            arrut[j][i] = -x*x*x * (y*y - 1);
+            arrut[j][i] = PetscCosReal(2*PETSC_PI*x)
+                          * PetscCosReal(2*PETSC_PI*y);
         }
     DMDAVecRestoreArray(da, ut, &arrut);
 
